@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: verisure-exporter
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: verisure-exporter
+spec:
+  selector:
+    app.kubernetes.io/name: verisure-exporter
+  ports:
+    - name: metrics
+      port: 9878
+      targetPort: metrics
+      protocol: TCP

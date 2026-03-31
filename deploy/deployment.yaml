@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: verisure-exporter
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: verisure-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: verisure-exporter
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: verisure-exporter
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9878"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: verisure-exporter
+          image: ghcr.io/jarsater/verisure-exporter:latest
+          ports:
+            - name: metrics
+              containerPort: 9878
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: verisure-exporter-credentials
+          env:
+            - name: RUST_LOG
+              value: "info"
+            - name: POLL_INTERVAL
+              value: "60"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: metrics
+            initialDelaySeconds: 5
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: metrics
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              memory: 64Mi
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
