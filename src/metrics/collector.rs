@@ -3,9 +3,7 @@ use tracing::warn;
 
 use crate::verisure::VerisureData;
 
-use super::registry::{
-    ClimateLabels, DeviceLabels, InstallationLabels, Metrics,
-};
+use super::registry::{ClimateLabels, DeviceLabels, InstallationLabels, Metrics};
 
 fn parse_timestamp(s: &str) -> Option<i64> {
     DateTime::parse_from_rfc3339(s)
