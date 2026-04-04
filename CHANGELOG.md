@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/jalet/verisure-exporter/compare/v0.1.1...v0.2.0) (2026-04-04)
+
+
+### Features
+
+* trigger release ([#5](https://github.com/jalet/verisure-exporter/issues/5)) ([8abb351](https://github.com/jalet/verisure-exporter/commit/8abb351a092e3bf0bf927840d5510fd3e756bdaf))
+
 ## [0.1.1](https://github.com/jalet/verisure-exporter/compare/v0.1.0...v0.1.1) (2026-04-04)
 
 
