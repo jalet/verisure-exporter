@@ -7,8 +7,8 @@ use serde_json::Value;
 use thiserror::Error;
 use tracing::{debug, info, warn};
 
-use crate::config::Config;
 use super::{queries, types::*};
+use crate::config::Config;
 
 #[derive(Debug, Error)]
 pub enum VerisureError {
@@ -58,7 +58,8 @@ impl VerisureClient {
 
     async fn login(&self) -> Result<(), VerisureError> {
         info!("Authenticating with Verisure API");
-        let resp = self.http
+        let resp = self
+            .http
             .post(format!("{}/auth/login", self.base_url))
             .json(&serde_json::json!({
                 "username": self.username,
@@ -71,7 +72,8 @@ impl VerisureClient {
         if !status.is_success() {
             let body = resp.text().await.unwrap_or_default();
             return Err(VerisureError::Auth(format!(
-                "Login failed with status {}: {}", status, body
+                "Login failed with status {}: {}",
+                status, body
             )));
         }
 
@@ -81,7 +83,7 @@ impl VerisureClient {
         if let Some(step_up) = body.get("stepUpToken") {
             if !step_up.is_null() {
                 return Err(VerisureError::Auth(
-                    "MFA (stepUpToken) required but not supported".to_string()
+                    "MFA (stepUpToken) required but not supported".to_string(),
                 ));
             }
         }
@@ -98,7 +100,8 @@ impl VerisureClient {
 
         info!("Auto-detecting installation GIID");
         let query = queries::account_installations_query(&self.username);
-        let resp = self.http
+        let resp = self
+            .http
             .post(format!("{}/graphql", self.base_url))
             .json(&vec![query])
             .send()
@@ -107,7 +110,8 @@ impl VerisureClient {
         let status = resp.status();
         if !status.is_success() {
             return Err(VerisureError::Api(format!(
-                "Installations query failed with status {}", status
+                "Installations query failed with status {}",
+                status
             )));
         }
 
@@ -126,7 +130,8 @@ impl VerisureClient {
             alias: Option<String>,
         }
 
-        let installations: Vec<Inst> = serde_json::from_value(installations_val)?;
+        let installations: Vec<Inst> =
+            serde_json::from_value(installations_val)?;
 
         match installations.len() {
             0 => Err(VerisureError::NoInstallations),
@@ -160,7 +165,8 @@ impl VerisureClient {
     pub async fn fetch_all(&self) -> Result<VerisureData, VerisureError> {
         let giid = {
             let lock = self.giid.lock().await;
-            lock.clone().ok_or_else(|| VerisureError::Api("GIID not set".to_string()))?
+            lock.clone()
+                .ok_or_else(|| VerisureError::Api("GIID not set".to_string()))?
         };
 
         match self.do_fetch(&giid).await {
@@ -173,7 +179,10 @@ impl VerisureClient {
         }
     }
 
-    async fn do_fetch(&self, giid: &str) -> Result<VerisureData, VerisureError> {
+    async fn do_fetch(
+        &self,
+        giid: &str,
+    ) -> Result<VerisureData, VerisureError> {
         let queries = vec![
             queries::arm_state_query(giid),
             queries::climate_query(giid),
@@ -183,7 +192,8 @@ impl VerisureClient {
             queries::broadband_query(giid),
         ];
 
-        let resp = self.http
+        let resp = self
+            .http
             .post(format!("{}/graphql", self.base_url))
             .json(&queries)
             .send()
@@ -198,7 +208,8 @@ impl VerisureClient {
         if !status.is_success() {
             let body = resp.text().await.unwrap_or_default();
             return Err(VerisureError::Api(format!(
-                "GraphQL request failed {}: {}", status, body
+                "GraphQL request failed {}: {}",
+                status, body
             )));
         }
 
@@ -206,7 +217,10 @@ impl VerisureClient {
         self.parse_response(body)
     }
 
-    fn parse_response(&self, responses: Vec<Value>) -> Result<VerisureData, VerisureError> {
+    fn parse_response(
+        &self,
+        responses: Vec<Value>,
+    ) -> Result<VerisureData, VerisureError> {
         let mut data = VerisureData::default();
 
         for (i, resp) in responses.iter().enumerate() {
@@ -215,7 +229,9 @@ impl VerisureClient {
                 continue;
             }
 
-            let Some(inst) = resp.get("data").and_then(|d| d.get("installation")) else {
+            let Some(inst) =
+                resp.get("data").and_then(|d| d.get("installation"))
+            else {
                 continue;
             };
 
@@ -227,7 +243,9 @@ impl VerisureClient {
             }
 
             if let Some(climate) = inst.get("climateValues") {
-                match serde_json::from_value::<Vec<ClimateValue>>(climate.clone()) {
+                match serde_json::from_value::<Vec<ClimateValue>>(
+                    climate.clone(),
+                ) {
                     Ok(v) => data.climate_values = v,
                     Err(e) => warn!("Failed to parse climateValues: {}", e),
                 }
@@ -243,7 +261,9 @@ impl VerisureClient {
             if let Some(locks) = inst.get("doorLockStatusList") {
                 match serde_json::from_value::<Vec<DoorLock>>(locks.clone()) {
                     Ok(v) => data.door_locks = v,
-                    Err(e) => warn!("Failed to parse doorLockStatusList: {}", e),
+                    Err(e) => {
+                        warn!("Failed to parse doorLockStatusList: {}", e)
+                    }
                 }
             }
 

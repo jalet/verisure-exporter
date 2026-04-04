@@ -6,8 +6,8 @@ use std::sync::{
 
 use http_body_util::Full;
 use hyper::body::Bytes;
-use hyper::{Method, Request, Response, StatusCode};
 use hyper::service::service_fn;
+use hyper::{Method, Request, Response, StatusCode};
 use hyper_util::rt::TokioIo;
 use prometheus_client::encoding::text::encode;
 use prometheus_client::registry::Registry;
@@ -35,7 +35,9 @@ pub async fn serve_metrics(
                 let registry = registry.clone();
                 let metrics_path = metrics_path.clone();
                 let ready = ready.clone();
-                async move { handle_request(req, registry, &metrics_path, ready).await }
+                async move {
+                    handle_request(req, registry, &metrics_path, ready).await
+                }
             });
 
             if let Err(e) = hyper::server::conn::http1::Builder::new()

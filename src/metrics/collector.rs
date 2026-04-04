@@ -3,7 +3,9 @@ use tracing::warn;
 
 use crate::verisure::VerisureData;
 
-use super::registry::{ClimateLabels, DeviceLabels, InstallationLabels, Metrics};
+use super::registry::{
+    ClimateLabels, DeviceLabels, InstallationLabels, Metrics,
+};
 
 fn parse_timestamp(s: &str) -> Option<i64> {
     DateTime::parse_from_rfc3339(s)
@@ -26,11 +28,17 @@ pub fn update_metrics(data: &VerisureData, metrics: &Metrics, giid: &str) {
                 -1
             }
         };
-        metrics.alarm_armed_state.get_or_create(&inst_labels).set(value);
+        metrics
+            .alarm_armed_state
+            .get_or_create(&inst_labels)
+            .set(value);
 
         if let Some(date) = &arm.date {
             if let Some(ts) = parse_timestamp(date) {
-                metrics.alarm_changed_timestamp.get_or_create(&inst_labels).set(ts);
+                metrics
+                    .alarm_changed_timestamp
+                    .get_or_create(&inst_labels)
+                    .set(ts);
             }
         }
     }
@@ -68,7 +76,10 @@ pub fn update_metrics(data: &VerisureData, metrics: &Metrics, giid: &str) {
 
         if let Some(rt) = &dw.report_time {
             if let Some(ts) = parse_timestamp(rt) {
-                metrics.door_window_report_timestamp.get_or_create(&labels).set(ts);
+                metrics
+                    .door_window_report_timestamp
+                    .get_or_create(&labels)
+                    .set(ts);
             }
         }
     }

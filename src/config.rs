@@ -1,7 +1,10 @@
 use clap::Parser;
 
 #[derive(Parser, Debug, Clone)]
-#[command(name = "verisure-exporter", about = "Prometheus exporter for Verisure alarm systems")]
+#[command(
+    name = "verisure-exporter",
+    about = "Prometheus exporter for Verisure alarm systems"
+)]
 pub struct Config {
     #[arg(long, env = "VERISURE_USERNAME")]
     pub username: String,
@@ -21,7 +24,11 @@ pub struct Config {
     #[arg(long, env = "POLL_INTERVAL", default_value = "60")]
     pub poll_interval: u64,
 
-    #[arg(long, env = "VERISURE_API_URL", default_value = "https://m-api01.verisure.com")]
+    #[arg(
+        long,
+        env = "VERISURE_API_URL",
+        default_value = "https://m-api01.verisure.com"
+    )]
     pub api_url: String,
 
     #[arg(long, env = "LOG_LEVEL", default_value = "info")]
