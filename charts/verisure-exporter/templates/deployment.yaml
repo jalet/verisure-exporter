@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "verisure-exporter.fullname" . }}
+  labels:
+    {{- include "verisure-exporter.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "verisure-exporter.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "verisure-exporter.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "verisure-exporter.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.exporter.port }}
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 2
+        env:
+        - name: LOG_LEVEL
+          value: {{ .Values.exporter.logLevel | quote }}
+        - name: POLL_INTERVAL
+          value: {{ .Values.exporter.pollInterval | quote }}
+        - name: LISTEN_ADDRESS
+          value: {{ .Values.exporter.listenAddr | quote }}
+        - name: VERISURE_API_URL
+          value: {{ .Values.exporter.apiUrl | quote }}
+        {{- if .Values.verisure.credentialsSecretRef.name }}
+        - name: VERISURE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.verisure.credentialsSecretRef.name }}
+              key: {{ .Values.verisure.credentialsSecretRef.usernameKey }}
+        - name: VERISURE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.verisure.credentialsSecretRef.name }}
+              key: {{ .Values.verisure.credentialsSecretRef.passwordKey }}
+        - name: VERISURE_GIID
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.verisure.credentialsSecretRef.name }}
+              key: {{ .Values.verisure.credentialsSecretRef.giidKey }}
+              optional: true
+        {{- else }}
+        - name: VERISURE_USERNAME
+          value: {{ .Values.verisure.username | quote }}
+        - name: VERISURE_PASSWORD
+          value: {{ .Values.verisure.password | quote }}
+        {{- if .Values.verisure.giid }}
+        - name: VERISURE_GIID
+          value: {{ .Values.verisure.giid | quote }}
+        {{- end }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

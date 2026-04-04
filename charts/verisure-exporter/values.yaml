@@ -1,0 +1,115 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/jalet/verisure-exporter
+  pullPolicy: IfNotPresent
+  tag: latest
+
+imagePullSecrets: []
+
+nameOverride: ''
+fullnameOverride: ''
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ''
+
+podAnnotations:
+  prometheus.io/scrape: 'true'
+  prometheus.io/port: '9878'
+  prometheus.io/path: '/metrics'
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  fsGroup: 65532
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 9878
+  annotations: {}
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 64Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Verisure credentials — provide either direct values or a secret reference.
+# If credentialsSecretRef.name is set, values from the secret take precedence
+# over inline username/password/giid values.
+verisure:
+  username: ''
+  password: ''
+  giid: ''
+  credentialsSecretRef:
+    name: ''
+    usernameKey: 'VERISURE_USERNAME'
+    passwordKey: 'VERISURE_PASSWORD'
+    giidKey: 'VERISURE_GIID'
+
+# Exporter configuration
+exporter:
+  logLevel: info
+  pollInterval: 60
+  listenAddr: '0.0.0.0:9878'
+  port: 9878
+  apiUrl: 'https://m-api01.verisure.com'
+
+# Prometheus ServiceMonitor
+serviceMonitor:
+  enabled: false
+  namespace: ''
+  interval: 30s
+  scrapeTimeout: 10s
+  labels: {}
+  honorLabels: false
+
+# Prometheus PrometheusRule
+prometheusRule:
+  enabled: false
+  namespace: ''
+  labels: {}
+  additionalRules: []
+
+# NetworkPolicy (standard Kubernetes)
+networkPolicy:
+  enabled: false
+  ingress: []
+  egress:
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443
+
+# Cilium NetworkPolicy
+ciliumNetworkPolicy:
+  enabled: false

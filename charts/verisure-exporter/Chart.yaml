@@ -1,0 +1,22 @@
+apiVersion: v2
+name: verisure-exporter
+description: Prometheus exporter for Verisure alarm systems
+type: application
+version: 0.1.0
+appVersion: '0.1.0'
+
+keywords:
+  - verisure
+  - alarm
+  - prometheus
+  - exporter
+
+home: https://github.com/jalet/verisure-exporter
+sources:
+  - https://github.com/jalet/verisure-exporter
+
+maintainers:
+  - name: Joakim Jarsater
+    email: joakim@jarsater.com
+
+dependencies: []

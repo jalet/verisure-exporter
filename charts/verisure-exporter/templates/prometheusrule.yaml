@@ -1,0 +1,37 @@
+{{- if .Values.prometheusRule.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "verisure-exporter.fullname" . }}
+  namespace: {{ .Values.prometheusRule.namespace | default .Release.Namespace }}
+  labels:
+    {{- include "verisure-exporter.labels" . | nindent 4 }}
+    {{- with .Values.prometheusRule.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+  - name: verisure-exporter.rules
+    interval: 30s
+    rules:
+    - alert: VerisureExporterDown
+      expr: up{job="verisure-exporter"} == 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Verisure exporter is down"
+        description: "Verisure exporter instance {{`{{ $labels.instance }}`}} has been down for more than 5 minutes."
+
+    - alert: VerisureScrapeErrors
+      expr: rate(verisure_scrape_errors_total[5m]) > 0.01
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Verisure exporter scrape errors"
+        description: "Verisure exporter is encountering errors scraping alarm system metrics."
+    {{- with .Values.prometheusRule.additionalRules }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end }}
