@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/jalet/verisure-exporter/compare/v0.1.0...v0.1.1) (2026-04-04)
+
+
+### Bug Fixes
+
+* **docker:** update Rust base image to latest stable ([9bebf91](https://github.com/jalet/verisure-exporter/commit/9bebf913b5da6bd2009d576b71cb6da30354685a))
+
 ## 0.1.0 (2026-04-04)
 
 
