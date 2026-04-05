@@ -105,7 +105,7 @@ impl VerisureClient {
         let resp = self
             .http
             .post(format!("{}/graphql", self.base_url))
-            .json(&vec![query])
+            .json(&query)
             .send()
             .await?;
 
@@ -117,10 +117,9 @@ impl VerisureClient {
             )));
         }
 
-        let body: Vec<Value> = resp.json().await?;
+        let body: Value = resp.json().await?;
         let installations_val = body
-            .first()
-            .and_then(|r| r.get("data"))
+            .get("data")
             .and_then(|d| d.get("account"))
             .and_then(|a| a.get("installations"))
             .cloned()
@@ -157,6 +156,22 @@ impl VerisureClient {
                 Err(VerisureError::MultipleInstallations)
             }
         }
+    }
+
+    pub async fn introspect(&self, type_name: &str) -> Result<String, VerisureError> {
+        let query = serde_json::json!({
+            "query": format!(
+                "{{ __type(name: \"{type_name}\") {{ fields {{ name type {{ name kind ofType {{ name }} }} }} }} }}"
+            )
+        });
+        let resp = self
+            .http
+            .post(format!("{}/graphql", self.base_url))
+            .json(&query)
+            .send()
+            .await?;
+        let body: Value = resp.json().await?;
+        Ok(serde_json::to_string_pretty(&body).unwrap_or_default())
     }
 
     pub async fn get_giid(&self) -> Option<String> {
@@ -235,10 +250,10 @@ impl VerisureClient {
                 }
             }
 
-            if let Some(climate) = inst.get("climateValues") {
+            if let Some(climate) = inst.get("climates") {
                 match serde_json::from_value::<Vec<ClimateValue>>(climate.clone()) {
                     Ok(v) => data.climate_values = v,
-                    Err(e) => warn!("Failed to parse climateValues: {}", e),
+                    Err(e) => warn!("Failed to parse climates: {}", e),
                 }
             }
 
@@ -249,12 +264,10 @@ impl VerisureClient {
                 }
             }
 
-            if let Some(locks) = inst.get("doorLockStatusList") {
+            if let Some(locks) = inst.get("smartLocks") {
                 match serde_json::from_value::<Vec<DoorLock>>(locks.clone()) {
                     Ok(v) => data.door_locks = v,
-                    Err(e) => {
-                        warn!("Failed to parse doorLockStatusList: {}", e)
-                    }
+                    Err(e) => warn!("Failed to parse smartLocks: {}", e),
                 }
             }
 

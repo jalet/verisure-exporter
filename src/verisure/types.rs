@@ -6,6 +6,7 @@ use serde::Deserialize;
 #[serde(rename_all = "camelCase")]
 pub struct Device {
     pub device_label: String,
+    pub area: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -21,18 +22,17 @@ pub struct ArmState {
 #[serde(rename_all = "camelCase")]
 pub struct ClimateValue {
     pub device: Device,
-    pub device_area: Option<String>,
-    pub device_type: Option<String>,
-    pub temperature: Option<f64>,
-    pub humidity: Option<f64>,
-    pub time: Option<String>,
+    pub humidity_enabled: Option<bool>,
+    pub humidity_timestamp: Option<String>,
+    pub humidity_value: Option<f64>,
+    pub temperature_timestamp: Option<String>,
+    pub temperature_value: Option<f64>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DoorWindow {
     pub device: Device,
-    pub area: Option<String>,
     pub state: String,
     pub wired: Option<bool>,
     pub report_time: Option<String>,
@@ -42,19 +42,21 @@ pub struct DoorWindow {
 #[serde(rename_all = "camelCase")]
 pub struct DoorLock {
     pub device: Device,
-    pub current_lock_state: String,
-    pub area: Option<String>,
+    pub lock_status: Option<String>,
+    pub door_state: Option<String>,
+    pub lock_method: Option<String>,
     pub event_time: Option<String>,
-    pub secure_mode_active: Option<bool>,
-    pub motor_jam: Option<bool>,
+    pub door_lock_type: Option<String>,
+    pub secure_mode: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct SmartPlug {
     pub device: Device,
-    pub area: Option<String>,
     pub current_state: String,
+    pub icon: Option<String>,
+    pub is_hazardous: Option<bool>,
 }
 
 #[derive(Debug, Deserialize, Clone)]

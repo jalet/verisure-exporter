@@ -34,7 +34,6 @@ pub struct Metrics {
     pub door_window_open: Family<DeviceLabels, Gauge>,
     pub door_window_report_timestamp: Family<DeviceLabels, Gauge>,
     pub lock_locked: Family<DeviceLabels, Gauge>,
-    pub lock_motor_jam: Family<DeviceLabels, Gauge>,
     pub lock_secure_mode: Family<DeviceLabels, Gauge>,
     pub smartplug_on: Family<DeviceLabels, Gauge>,
     pub broadband_connected: Family<InstallationLabels, Gauge>,
@@ -96,13 +95,6 @@ impl Metrics {
             lock_locked.clone(),
         );
 
-        let lock_motor_jam = Family::default();
-        sub.register(
-            "lock_motor_jam",
-            "1 if lock motor is jammed",
-            lock_motor_jam.clone(),
-        );
-
         let lock_secure_mode = Family::default();
         sub.register(
             "lock_secure_mode",
@@ -153,7 +145,6 @@ impl Metrics {
             door_window_open,
             door_window_report_timestamp,
             lock_locked,
-            lock_motor_jam,
             lock_secure_mode,
             smartplug_on,
             broadband_connected,
