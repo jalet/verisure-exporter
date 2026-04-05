@@ -81,7 +81,7 @@ exporter:
   pollInterval: 60
   listenAddr: '0.0.0.0:9878'
   port: 9878
-  apiUrl: 'https://m-api01.verisure.com'
+  apiUrl: 'https://automation01.verisure.com'
 
 # Prometheus ServiceMonitor
 serviceMonitor:
