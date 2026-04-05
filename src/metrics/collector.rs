@@ -45,13 +45,13 @@ pub fn update_metrics(data: &VerisureData, metrics: &Metrics, giid: &str) {
         let labels = ClimateLabels {
             installation: giid.to_string(),
             device_label: cv.device.device_label.clone(),
-            area: cv.device_area.clone().unwrap_or_default(),
-            device_type: cv.device_type.clone().unwrap_or_default(),
+            area: cv.device.area.clone().unwrap_or_default(),
+            device_type: String::new(),
         };
-        if let Some(temp) = cv.temperature {
+        if let Some(temp) = cv.temperature_value {
             metrics.temperature_celsius.get_or_create(&labels).set(temp);
         }
-        if let Some(hum) = cv.humidity {
+        if let Some(hum) = cv.humidity_value {
             metrics.humidity_percent.get_or_create(&labels).set(hum);
         }
     }
@@ -60,7 +60,7 @@ pub fn update_metrics(data: &VerisureData, metrics: &Metrics, giid: &str) {
         let labels = DeviceLabels {
             installation: giid.to_string(),
             device_label: dw.device.device_label.clone(),
-            area: dw.area.clone().unwrap_or_default(),
+            area: dw.device.area.clone().unwrap_or_default(),
         };
         let open: i64 = match dw.state.as_str() {
             "OPEN" => 1,
@@ -86,9 +86,9 @@ pub fn update_metrics(data: &VerisureData, metrics: &Metrics, giid: &str) {
         let labels = DeviceLabels {
             installation: giid.to_string(),
             device_label: lock.device.device_label.clone(),
-            area: lock.area.clone().unwrap_or_default(),
+            area: lock.device.area.clone().unwrap_or_default(),
         };
-        let locked: i64 = match lock.current_lock_state.as_str() {
+        let locked: i64 = match lock.lock_status.as_deref().unwrap_or("") {
             "LOCKED" => 1,
             "UNLOCKED" => 0,
             other => {
@@ -98,20 +98,16 @@ pub fn update_metrics(data: &VerisureData, metrics: &Metrics, giid: &str) {
         };
         metrics.lock_locked.get_or_create(&labels).set(locked);
         metrics
-            .lock_motor_jam
-            .get_or_create(&labels)
-            .set(i64::from(lock.motor_jam.unwrap_or(false)));
-        metrics
             .lock_secure_mode
             .get_or_create(&labels)
-            .set(i64::from(lock.secure_mode_active.unwrap_or(false)));
+            .set(i64::from(lock.secure_mode.as_deref() == Some("SECURE_MODE_ON")));
     }
 
     for plug in &data.smart_plugs {
         let labels = DeviceLabels {
             installation: giid.to_string(),
             device_label: plug.device.device_label.clone(),
-            area: plug.area.clone().unwrap_or_default(),
+            area: plug.device.area.clone().unwrap_or_default(),
         };
         let on: i64 = match plug.current_state.as_str() {
             "ON" => 1,

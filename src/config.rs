@@ -33,4 +33,7 @@ pub struct Config {
 
     #[arg(long, env = "LOG_LEVEL", default_value = "info")]
     pub log_level: String,
+
+    #[arg(long, help = "Run GraphQL introspection queries and exit")]
+    pub api_introspection: bool,
 }

@@ -35,6 +35,14 @@ async fn main() -> anyhow::Result<()> {
     let client = Arc::new(VerisureClient::new(&config).await?);
     client.init().await?;
 
+    if config.api_introspection {
+        for type_name in &["Climate", "SmartLock", "SmartPlug", "Installation"] {
+            println!("=== {} ===", type_name);
+            println!("{}", client.introspect(type_name).await?);
+        }
+        return Ok(());
+    }
+
     let giid = client
         .get_giid()
         .await
