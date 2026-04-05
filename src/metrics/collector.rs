@@ -3,7 +3,9 @@ use tracing::warn;
 
 use crate::verisure::VerisureData;
 
-use super::registry::{ClimateLabels, DeviceLabels, InstallationLabels, Metrics};
+use super::registry::{
+    ClimateLabels, DeviceLabels, InstallationLabels, Metrics,
+};
 
 fn parse_timestamp(s: &str) -> Option<i64> {
     DateTime::parse_from_rfc3339(s)
@@ -100,7 +102,9 @@ pub fn update_metrics(data: &VerisureData, metrics: &Metrics, giid: &str) {
         metrics
             .lock_secure_mode
             .get_or_create(&labels)
-            .set(i64::from(lock.secure_mode.as_deref() == Some("SECURE_MODE_ON")));
+            .set(i64::from(
+                lock.secure_mode.as_deref() == Some("SECURE_MODE_ON"),
+            ));
     }
 
     for plug in &data.smart_plugs {
