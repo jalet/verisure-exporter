@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/jalet/verisure-exporter/compare/v0.2.0...v0.2.1) (2026-04-05)
+
+
+### Bug Fixes
+
+* **auth:** use HTTP Basic Auth for Verisure API login ([#7](https://github.com/jalet/verisure-exporter/issues/7)) ([26564a3](https://github.com/jalet/verisure-exporter/commit/26564a3aaecaa6673e14654e60e0d3c55db716b7))
+
 ## [0.2.0](https://github.com/jalet/verisure-exporter/compare/v0.1.1...v0.2.0) (2026-04-04)
 
 
