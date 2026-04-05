@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/jalet/verisure-exporter/compare/v0.3.0...v0.3.1) (2026-04-05)
+
+
+### Bug Fixes
+
+* **auth:** add Content-Length header and empty body to login request ([#11](https://github.com/jalet/verisure-exporter/issues/11)) ([1ca2aa2](https://github.com/jalet/verisure-exporter/commit/1ca2aa2eb4b35cfadeb31ecac2f9535d8dc05c4d))
+* **graphql:** update field names to match Verisure API schema ([#13](https://github.com/jalet/verisure-exporter/issues/13)) ([8a433a0](https://github.com/jalet/verisure-exporter/commit/8a433a06f7cfadc1153f05f1e417d410c890ab68))
+
 ## [0.3.0](https://github.com/jalet/verisure-exporter/compare/v0.2.1...v0.3.0) (2026-04-05)
 
 
