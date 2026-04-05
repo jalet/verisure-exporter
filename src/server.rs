@@ -35,9 +35,7 @@ pub async fn serve_metrics(
                 let registry = registry.clone();
                 let metrics_path = metrics_path.clone();
                 let ready = ready.clone();
-                async move {
-                    handle_request(req, registry, &metrics_path, ready).await
-                }
+                async move { handle_request(req, registry, &metrics_path, ready).await }
             });
 
             if let Err(e) = hyper::server::conn::http1::Builder::new()

@@ -23,9 +23,7 @@ async fn main() -> anyhow::Result<()> {
     let config = Config::parse();
 
     let filter = tracing_subscriber::EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| {
-            tracing_subscriber::EnvFilter::new(&config.log_level)
-        });
+        .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new(&config.log_level));
     tracing_subscriber::fmt().with_env_filter(filter).init();
 
     info!("Starting verisure-exporter");
@@ -38,8 +36,7 @@ async fn main() -> anyhow::Result<()> {
     client.init().await?;
 
     if config.api_introspection {
-        for type_name in &["Climate", "SmartLock", "SmartPlug", "Installation"]
-        {
+        for type_name in &["Climate", "SmartLock", "SmartPlug", "Installation"] {
             println!("=== {} ===", type_name);
             println!("{}", client.introspect(type_name).await?);
         }
@@ -67,8 +64,7 @@ async fn main() -> anyhow::Result<()> {
     }
 
     let listen_addr: SocketAddr = config.listen_address.parse()?;
-    server::serve_metrics(registry, listen_addr, config.metrics_path, ready)
-        .await?;
+    server::serve_metrics(registry, listen_addr, config.metrics_path, ready).await?;
 
     Ok(())
 }

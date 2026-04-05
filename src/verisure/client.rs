@@ -131,8 +131,7 @@ impl VerisureClient {
             alias: Option<String>,
         }
 
-        let installations: Vec<Inst> =
-            serde_json::from_value(installations_val)?;
+        let installations: Vec<Inst> = serde_json::from_value(installations_val)?;
 
         match installations.len() {
             0 => Err(VerisureError::NoInstallations),
@@ -159,10 +158,7 @@ impl VerisureClient {
         }
     }
 
-    pub async fn introspect(
-        &self,
-        type_name: &str,
-    ) -> Result<String, VerisureError> {
+    pub async fn introspect(&self, type_name: &str) -> Result<String, VerisureError> {
         let query = serde_json::json!({
             "query": format!(
                 "{{ __type(name: \"{type_name}\") {{ fields {{ name type {{ name kind ofType {{ name }} }} }} }} }}"
@@ -199,10 +195,7 @@ impl VerisureClient {
         }
     }
 
-    async fn do_fetch(
-        &self,
-        giid: &str,
-    ) -> Result<VerisureData, VerisureError> {
+    async fn do_fetch(&self, giid: &str) -> Result<VerisureData, VerisureError> {
         let queries = vec![
             queries::arm_state_query(giid),
             queries::climate_query(giid),
@@ -237,10 +230,7 @@ impl VerisureClient {
         self.parse_response(body)
     }
 
-    fn parse_response(
-        &self,
-        responses: Vec<Value>,
-    ) -> Result<VerisureData, VerisureError> {
+    fn parse_response(&self, responses: Vec<Value>) -> Result<VerisureData, VerisureError> {
         let mut data = VerisureData::default();
 
         for (i, resp) in responses.iter().enumerate() {
@@ -249,9 +239,7 @@ impl VerisureClient {
                 continue;
             }
 
-            let Some(inst) =
-                resp.get("data").and_then(|d| d.get("installation"))
-            else {
+            let Some(inst) = resp.get("data").and_then(|d| d.get("installation")) else {
                 continue;
             };
 
@@ -263,9 +251,7 @@ impl VerisureClient {
             }
 
             if let Some(climate) = inst.get("climates") {
-                match serde_json::from_value::<Vec<ClimateValue>>(
-                    climate.clone(),
-                ) {
+                match serde_json::from_value::<Vec<ClimateValue>>(climate.clone()) {
                     Ok(v) => data.climate_values = v,
                     Err(e) => warn!("Failed to parse climates: {}", e),
                 }
