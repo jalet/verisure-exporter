@@ -27,7 +27,7 @@ pub struct Config {
     #[arg(
         long,
         env = "VERISURE_API_URL",
-        default_value = "https://m-api01.verisure.com"
+        default_value = "https://automation01.verisure.com"
     )]
     pub api_url: String,
 

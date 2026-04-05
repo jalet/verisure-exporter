@@ -63,10 +63,8 @@ impl VerisureClient {
         let resp = self
             .http
             .post(format!("{}/auth/login", self.base_url))
-            .json(&serde_json::json!({
-                "username": self.username,
-                "password": self.password
-            }))
+            .header("APPLICATION_ID", "PS_PYTHON")
+            .basic_auth(&self.username, Some(&self.password))
             .send()
             .await?;
 
