@@ -65,6 +65,8 @@ impl VerisureClient {
             .post(format!("{}/auth/login", self.base_url))
             .header("APPLICATION_ID", "PS_PYTHON")
             .basic_auth(&self.username, Some(&self.password))
+            .header("Content-Length", "0")
+            .body("")
             .send()
             .await?;
 
