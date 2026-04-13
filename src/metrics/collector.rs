@@ -3,7 +3,7 @@ use tracing::warn;
 
 use crate::verisure::VerisureData;
 
-use super::registry::{ClimateLabels, DeviceLabels, InstallationLabels, Metrics};
+use super::registry::{ClimateLabels, DeviceLabels, DoorLockLabels, InstallationLabels, Metrics};
 
 fn parse_timestamp(s: &str) -> Option<i64> {
     DateTime::parse_from_rfc3339(s)
@@ -83,10 +83,12 @@ pub fn update_metrics(data: &VerisureData, metrics: &Metrics, giid: &str) {
     }
 
     for lock in &data.door_locks {
-        let labels = DeviceLabels {
+        let labels = DoorLockLabels {
             installation: giid.to_string(),
             device_label: lock.device.device_label.clone(),
             area: lock.device.area.clone().unwrap_or_default(),
+            user: lock.user_string.clone().unwrap_or_default(),
+            method: lock.lock_method.clone().unwrap_or_default(),
         };
         let locked: i64 = match lock.lock_status.as_deref().unwrap_or("") {
             "LOCKED" => 1,

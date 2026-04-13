@@ -48,6 +48,7 @@ pub struct DoorLock {
     pub event_time: Option<String>,
     pub door_lock_type: Option<String>,
     pub secure_mode: Option<String>,
+    pub user_string: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Clone)]

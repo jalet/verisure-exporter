@@ -26,6 +26,15 @@ pub struct DeviceLabels {
     pub area: String,
 }
 
+#[derive(Clone, Debug, Hash, PartialEq, Eq, EncodeLabelSet)]
+pub struct DoorLockLabels {
+    pub installation: String,
+    pub device_label: String,
+    pub area: String,
+    pub user: String,
+    pub method: String,
+}
+
 pub struct Metrics {
     pub alarm_armed_state: Family<InstallationLabels, Gauge>,
     pub alarm_changed_timestamp: Family<InstallationLabels, Gauge>,
@@ -33,8 +42,8 @@ pub struct Metrics {
     pub humidity_percent: Family<ClimateLabels, Gauge<f64, AtomicU64>>,
     pub door_window_open: Family<DeviceLabels, Gauge>,
     pub door_window_report_timestamp: Family<DeviceLabels, Gauge>,
-    pub lock_locked: Family<DeviceLabels, Gauge>,
-    pub lock_secure_mode: Family<DeviceLabels, Gauge>,
+    pub lock_locked: Family<DoorLockLabels, Gauge>,
+    pub lock_secure_mode: Family<DoorLockLabels, Gauge>,
     pub smartplug_on: Family<DeviceLabels, Gauge>,
     pub broadband_connected: Family<InstallationLabels, Gauge>,
     pub scrape_duration_seconds: Gauge<f64, AtomicU64>,
