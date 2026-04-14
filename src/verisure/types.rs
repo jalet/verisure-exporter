@@ -40,6 +40,12 @@ pub struct DoorWindow {
 
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
+pub struct DoorLockUser {
+    pub name: Option<String>,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct DoorLock {
     pub device: Device,
     pub lock_status: Option<String>,
@@ -48,7 +54,7 @@ pub struct DoorLock {
     pub event_time: Option<String>,
     pub door_lock_type: Option<String>,
     pub secure_mode: Option<String>,
-    pub user_string: Option<String>,
+    pub user: Option<DoorLockUser>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
