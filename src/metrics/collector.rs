@@ -87,7 +87,11 @@ pub fn update_metrics(data: &VerisureData, metrics: &Metrics, giid: &str) {
             installation: giid.to_string(),
             device_label: lock.device.device_label.clone(),
             area: lock.device.area.clone().unwrap_or_default(),
-            user: lock.user.as_ref().and_then(|u| u.name.clone()).unwrap_or_default(),
+            user: lock
+                .user
+                .as_ref()
+                .and_then(|u| u.name.clone())
+                .unwrap_or_default(),
             method: lock.lock_method.clone().unwrap_or_default(),
         };
         let locked: i64 = match lock.lock_status.as_deref().unwrap_or("") {
