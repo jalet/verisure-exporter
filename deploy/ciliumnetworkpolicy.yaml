@@ -17,8 +17,8 @@ spec:
               protocol: TCP
   egress:
     - toFQDNs:
-        - matchName: "m-api01.verisure.com"
-        - matchName: "automation.verisure.com"
+        - matchName: "automation01.verisure.com"
+        - matchName: "automation02.verisure.com"
       toPorts:
         - ports:
             - port: "443"
