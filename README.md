@@ -119,7 +119,7 @@ All settings can be provided as environment variables or CLI flags.
 | `VERISURE_USERNAME` | -- | Verisure account email |
 | `VERISURE_PASSWORD` | -- | Verisure account password |
 | `VERISURE_GIID` | auto-detect | Installation GIID |
-| `VERISURE_API_URL` | `https://automation01.verisure.com` | API base URL |
+| `VERISURE_API_URL` | `https://automation01.verisure.com,https://automation02.verisure.com` | Comma-separated API endpoint(s) with automatic failover |
 | `LISTEN_ADDRESS` | `0.0.0.0:9878` | HTTP listen address |
 | `METRICS_PATH` | `/metrics` | Metrics endpoint path |
 | `POLL_INTERVAL` | `60` | Seconds between polls |

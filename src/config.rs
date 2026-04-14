@@ -27,9 +27,10 @@ pub struct Config {
     #[arg(
         long,
         env = "VERISURE_API_URL",
-        default_value = "https://automation01.verisure.com"
+        default_value = "https://automation01.verisure.com,https://automation02.verisure.com",
+        value_delimiter = ','
     )]
-    pub api_url: String,
+    pub api_url: Vec<String>,
 
     #[arg(long, env = "LOG_LEVEL", default_value = "info")]
     pub log_level: String,

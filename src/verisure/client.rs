@@ -26,11 +26,14 @@ pub enum VerisureError {
         "Multiple installations found, please specify --giid. Found installations logged above."
     )]
     MultipleInstallations,
+    #[error("Service unavailable on all API endpoints")]
+    ServiceUnavailable,
 }
 
 pub struct VerisureClient {
     http: Client,
-    base_url: String,
+    api_urls: Vec<String>,
+    active_url: Arc<Mutex<String>>,
     username: String,
     password: String,
     giid: Arc<Mutex<Option<String>>>,
@@ -43,9 +46,12 @@ impl VerisureClient {
             .user_agent("verisure-exporter/0.1.0")
             .build()?;
 
+        let first_url = config.api_url.first().cloned().unwrap_or_default();
+
         Ok(Self {
             http,
-            base_url: config.api_url.clone(),
+            api_urls: config.api_url.clone(),
+            active_url: Arc::new(Mutex::new(first_url)),
             username: config.username.clone(),
             password: config.password.clone(),
             giid: Arc::new(Mutex::new(config.giid.clone())),
@@ -53,16 +59,42 @@ impl VerisureClient {
     }
 
     pub async fn init(&self) -> Result<(), VerisureError> {
-        self.login().await?;
-        self.ensure_giid().await?;
-        Ok(())
+        for url in &self.api_urls {
+            info!(url = %url, "Trying API endpoint");
+            *self.active_url.lock().await = url.clone();
+
+            if let Err(e) = self.login().await {
+                warn!(url = %url, error = %e, "Login failed, trying next endpoint");
+                continue;
+            }
+
+            match self.ensure_giid().await {
+                Ok(()) => {
+                    info!(url = %url, "Connected to API endpoint");
+                    return Ok(());
+                }
+                Err(e) => {
+                    warn!(url = %url, error = %e, "GIID lookup failed, trying next endpoint");
+                    continue;
+                }
+            }
+        }
+
+        Err(VerisureError::Auth(
+            "All API endpoints failed during init".to_string(),
+        ))
+    }
+
+    async fn base_url(&self) -> String {
+        self.active_url.lock().await.clone()
     }
 
     async fn login(&self) -> Result<(), VerisureError> {
-        info!("Authenticating with Verisure API");
+        let base_url = self.base_url().await;
+        info!(url = %base_url, "Authenticating with Verisure API");
         let resp = self
             .http
-            .post(format!("{}/auth/login", self.base_url))
+            .post(format!("{}/auth/login", base_url))
             .header("APPLICATION_ID", "PS_PYTHON")
             .basic_auth(&self.username, Some(&self.password))
             .header("Content-Length", "0")
@@ -100,11 +132,12 @@ impl VerisureClient {
             return Ok(());
         }
 
+        let base_url = self.base_url().await;
         info!("Auto-detecting installation GIID");
         let query = queries::account_installations_query(&self.username);
         let resp = self
             .http
-            .post(format!("{}/graphql", self.base_url))
+            .post(format!("{}/graphql", base_url))
             .json(&query)
             .send()
             .await?;
@@ -159,6 +192,7 @@ impl VerisureClient {
     }
 
     pub async fn introspect(&self, type_name: &str) -> Result<String, VerisureError> {
+        let base_url = self.base_url().await;
         let query = serde_json::json!({
             "query": format!(
                 "{{ __type(name: \"{type_name}\") {{ fields {{ name type {{ name kind ofType {{ name }} }} }} }} }}"
@@ -166,7 +200,7 @@ impl VerisureClient {
         });
         let resp = self
             .http
-            .post(format!("{}/graphql", self.base_url))
+            .post(format!("{}/graphql", base_url))
             .json(&query)
             .send()
             .await?;
@@ -191,11 +225,39 @@ impl VerisureClient {
                 self.login().await?;
                 self.do_fetch(&giid).await
             }
+            Err(VerisureError::ServiceUnavailable) => self.failover(&giid).await,
             other => other,
         }
     }
 
+    async fn failover(&self, giid: &str) -> Result<VerisureData, VerisureError> {
+        let current = self.base_url().await;
+        for url in &self.api_urls {
+            if *url == current {
+                continue;
+            }
+            warn!(url = %url, "Failing over to next API endpoint");
+            *self.active_url.lock().await = url.clone();
+
+            if let Err(e) = self.login().await {
+                warn!(url = %url, error = %e, "Login failed during failover");
+                continue;
+            }
+
+            match self.do_fetch(giid).await {
+                Err(VerisureError::ServiceUnavailable) => {
+                    warn!(url = %url, "Endpoint also unavailable");
+                    continue;
+                }
+                other => return other,
+            }
+        }
+
+        Err(VerisureError::ServiceUnavailable)
+    }
+
     async fn do_fetch(&self, giid: &str) -> Result<VerisureData, VerisureError> {
+        let base_url = self.base_url().await;
         let queries = vec![
             queries::arm_state_query(giid),
             queries::climate_query(giid),
@@ -207,7 +269,7 @@ impl VerisureClient {
 
         let resp = self
             .http
-            .post(format!("{}/graphql", self.base_url))
+            .post(format!("{}/graphql", base_url))
             .json(&queries)
             .send()
             .await?;
@@ -232,9 +294,13 @@ impl VerisureClient {
 
     fn parse_response(&self, responses: Vec<Value>) -> Result<VerisureData, VerisureError> {
         let mut data = VerisureData::default();
+        let mut unavailable_count = 0;
 
         for (i, resp) in responses.iter().enumerate() {
             if let Some(errors) = resp.get("errors") {
+                if Self::is_service_unavailable(errors) {
+                    unavailable_count += 1;
+                }
                 warn!(index = i, errors = %errors, "GraphQL errors in response");
                 continue;
             }
@@ -286,6 +352,23 @@ impl VerisureClient {
             }
         }
 
+        if unavailable_count == responses.len() {
+            return Err(VerisureError::ServiceUnavailable);
+        }
+
         Ok(data)
+    }
+
+    fn is_service_unavailable(errors: &Value) -> bool {
+        let arr = match errors.as_array() {
+            Some(a) => a,
+            None => return false,
+        };
+        arr.iter().any(|e| {
+            e.get("data")
+                .and_then(|d| d.get("errorCode"))
+                .and_then(|c| c.as_str())
+                == Some("SYS_00004")
+        })
     }
 }

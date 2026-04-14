@@ -28,7 +28,7 @@ pub fn door_lock_query(giid: &str) -> Value {
     json!({
         "operationName": "DoorLock",
         "variables": { "giid": giid },
-        "query": "query DoorLock($giid: String!) { installation(giid: $giid) { smartLocks { device { deviceLabel area } lockStatus doorState lockMethod eventTime doorLockType secureMode } } }"
+        "query": "query DoorLock($giid: String!) { installation(giid: $giid) { smartLocks { device { deviceLabel area } lockStatus doorState lockMethod eventTime doorLockType secureMode user { name } } } }"
     })
 }
 
