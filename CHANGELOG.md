@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/jalet/verisure-exporter/compare/v0.3.1...v0.4.0) (2026-04-14)
+
+
+### Features
+
+* **metrics:** add user and method labels to door lock metrics ([#15](https://github.com/jalet/verisure-exporter/issues/15)) ([6b6a0e7](https://github.com/jalet/verisure-exporter/commit/6b6a0e755d0a9feba4d3ab49c7fc2d5bf1a805bb))
+
 ## [0.3.1](https://github.com/jalet/verisure-exporter/compare/v0.3.0...v0.3.1) (2026-04-05)
 
 
