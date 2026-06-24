@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.1](https://github.com/jalet/verisure-exporter/compare/v0.4.0...v0.4.1) (2026-06-24)
+
+
+### Bug Fixes
+
+* **deps:** update rust crate prometheus-client to 0.25 ([#26](https://github.com/jalet/verisure-exporter/issues/26)) ([62891c2](https://github.com/jalet/verisure-exporter/commit/62891c2ca6f9d9a53224d353b0d24faf7fdd90d2))
+* **deps:** update rust crate reqwest to 0.13 ([#27](https://github.com/jalet/verisure-exporter/issues/27)) ([2d5c09f](https://github.com/jalet/verisure-exporter/commit/2d5c09f8c4e7f025e529d7b45670aefd84e2bd0e))
+
 ## [0.4.0](https://github.com/jalet/verisure-exporter/compare/v0.3.1...v0.4.0) (2026-04-14)
 
 
