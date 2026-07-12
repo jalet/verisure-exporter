@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/jalet/verisure-exporter/compare/v0.4.1...v0.4.2) (2026-07-12)
+
+
+### Bug Fixes
+
+* **deps:** bump rustls-webpki to 0.103.13 ([#43](https://github.com/jalet/verisure-exporter/issues/43)) ([f56a69e](https://github.com/jalet/verisure-exporter/commit/f56a69ebb7cccc87c0cbe0e162a01653b2b49a33))
+
 ## [0.4.1](https://github.com/jalet/verisure-exporter/compare/v0.4.0...v0.4.1) (2026-06-24)
 
 
