@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.3](https://github.com/jalet/verisure-exporter/compare/v0.4.2...v0.4.3) (2026-08-04)
+
+
+### Bug Fixes
+
+* **deps:** unblock clap lockfile update by co-bumping syn ([#57](https://github.com/jalet/verisure-exporter/issues/57)) ([5c92c8d](https://github.com/jalet/verisure-exporter/commit/5c92c8d724b5b5b7546a14582a1776f5e386ec17))
+
 ## [0.4.2](https://github.com/jalet/verisure-exporter/compare/v0.4.1...v0.4.2) (2026-07-12)
 
 
