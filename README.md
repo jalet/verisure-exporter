@@ -42,7 +42,7 @@ graph LR
     C --> D[VerisureClient<br/>client.rs]
     D --> E[MetricsCollector<br/>collector.rs]
     E --> F[HTTP Server<br/>server.rs]
-    F --> G[/metrics]
+    F --> G["/metrics"]
     G --> H[Prometheus]
     H --> I[Grafana]
 ```
