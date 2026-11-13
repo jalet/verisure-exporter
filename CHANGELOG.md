@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.4](https://github.com/jalet/verisure-exporter/compare/v0.4.3...v0.4.4) (2026-11-13)
+
+
+### Bug Fixes
+
+* **deps:** update rust crate prometheus-client to 0.26 ([#84](https://github.com/jalet/verisure-exporter/issues/84)) ([95cf334](https://github.com/jalet/verisure-exporter/commit/95cf33429b313427e3e45a0ed465c9d5be94c406))
+
 ## [0.4.3](https://github.com/jalet/verisure-exporter/compare/v0.4.2...v0.4.3) (2026-08-04)
 
 
