@@ -71,7 +71,7 @@ jobs:
             type=gha,mode=max
             type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
 
-      - uses: sigstore/cosign-installer@v4.1.3
+      - uses: sigstore/cosign-installer@v4.1.4
 
       - name: Sign image
         env:
